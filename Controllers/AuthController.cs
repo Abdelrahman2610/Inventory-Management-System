@@ -103,12 +103,13 @@ namespace Inventory_Managment_System.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             _logger.LogInformation("User logging out");
             await _signInManager.SignOutAsync();
             HttpContext.Session.Clear();
-            return RedirectToAction("Login");
+            return RedirectToAction("Login", "Auth");
         }
 
         [HttpGet]

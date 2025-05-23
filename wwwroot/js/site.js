@@ -1,4 +1,14 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿$(document).ready(function () {
+    $.validator.setDefaults({
+        ignore: "[data-val-ignore-id=true] [name='Id']"
+    });
 
-// Write your JavaScript code.
+    $("form").on("submit", function (e) {
+        if (!$(this).valid()) {
+            console.log("Validation failed. Errors: ", $(this).validate().errorList);
+        } else {
+            console.log("Form submitted: " + $(this).attr("action"));
+            console.log("Form data: ", $(this).serialize());
+        }
+    });
+});
