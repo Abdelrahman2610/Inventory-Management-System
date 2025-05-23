@@ -152,8 +152,10 @@ namespace Inventory_Managment_System.Controllers
         [HttpGet]
         public IActionResult ForgotPassword()
         {
-            return View();
+            _logger.LogInformation("Accessing Forgot Password GET action");
+            return View(new ForgotPasswordModel());
         }
+
         [HttpPost]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
         {
@@ -161,67 +163,89 @@ namespace Inventory_Managment_System.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user != null && !string.IsNullOrEmpty(user.Email) && await _userManager.IsEmailConfirmedAsync(user))
+                if (user == null || !user.is_active)
                 {
-                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                    var resetLink = Url.Action("ResetPassword", "Auth", new { token, email = user.Email }, Request.Scheme);
-                    var body = $"Please reset your password by clicking this link: {resetLink}\n\nThis link will expire in 1 hour.";
-                    try
-                    {
-                        await _emailService.SendEmailAsync(user.Email, "Reset Your Password", body);
-                        _logger.LogInformation("Password reset email sent to: {Email} with link: {ResetLink}", model.Email, resetLink);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to send password reset email to: {Email}", model.Email);
-                        ModelState.AddModelError("", "Failed to send reset email. Please try again later.");
-                        return View(model);
-                    }
-                    return RedirectToAction("ForgotPasswordConfirmation");
+                    ModelState.AddModelError("", "No active user found with that email address.");
+                    _logger.LogWarning("Forgot password failed - no active user found for email: {Email}", model.Email);
+                    return View(model);
                 }
-                _logger.LogInformation("Password reset requested for email (not confirmed or not found): {Email}", model.Email);
-                return RedirectToAction("ForgotPasswordConfirmation");
+                return RedirectToAction("SecurityQuestion", new { email = model.Email });
             }
             return View(model);
         }
 
         [HttpGet]
-        public IActionResult ResetPassword(string token, string email)
+        public async Task<IActionResult> SecurityQuestion(string email)
         {
-            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
+            _logger.LogInformation("Accessing Security Question GET action for email: {Email}", email);
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null || string.IsNullOrEmpty(user.SecurityQuestion) || string.IsNullOrEmpty(user.SecurityAnswer))
             {
-                ModelState.AddModelError("", "Invalid password reset token.");
-                return View();
+                _logger.LogWarning("Security question not set or user not found for email: {Email}", email);
+                ModelState.AddModelError("", "Security question not set for this account. Contact support.");
+                return View("ForgotPassword", new ForgotPasswordModel { Email = email });
             }
-            return View(new ResetPasswordModel { Token = token, Email = email });
+            ViewBag.Email = email;
+            ViewBag.SecurityQuestion = user.SecurityQuestion;
+            return View(new SecurityQuestionModel { Email = email });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SecurityQuestion(SecurityQuestionModel model)
+        {
+            _logger.LogInformation("Security question submission for email: {Email}", model.Email);
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null || string.IsNullOrEmpty(user.SecurityAnswer))
+                {
+                    ModelState.AddModelError("", "Invalid email or security answer not set.");
+                    _logger.LogWarning("Security question failed - invalid email or answer not set for: {Email}", model.Email);
+                    return View(model);
+                }
+                if (user.SecurityAnswer.ToLower() != model.Answer.ToLower())
+                {
+                    ModelState.AddModelError("", "Incorrect security answer.");
+                    _logger.LogWarning("Incorrect security answer for email: {Email}", model.Email);
+                    return View(model);
+                }
+                return RedirectToAction("ResetPassword", new { email = model.Email });
+            }
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string email)
+        {
+            _logger.LogInformation("Accessing Reset Password GET action for email: {Email}", email);
+            return View(new ResetPasswordModel { Email = email });
         }
 
         [HttpPost]
         public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
         {
+            _logger.LogInformation("Reset password request for email: {Email}", model.Email);
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user != null)
+                if (user == null)
                 {
-                    var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
-                    if (result.Succeeded)
-                    {
-                        _logger.LogInformation("Password reset successful for user: {Email}", model.Email);
-                        return RedirectToAction("ResetPasswordConfirmation");
-                    }
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-                        _logger.LogWarning("Password reset error for user {Email}: {Error}", model.Email, error.Description);
-                    }
+                    ModelState.AddModelError("", "No user found with that email address.");
+                    _logger.LogWarning("Reset password failed - user not found for email: {Email}", model.Email);
+                    return View(model);
                 }
-                else
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user); // Generate token for reset
+                var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+                if (result.Succeeded)
                 {
-                    ModelState.AddModelError("", "User not found.");
-                    _logger.LogWarning("Password reset failed - user not found: {Email}", model.Email);
+                    _logger.LogInformation("Password reset successful for email: {Email}", model.Email);
+                    return RedirectToAction("ResetPasswordConfirmation");
                 }
-                return View(model);
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                    _logger.LogWarning("Reset password error for email {Email}: {Error}", model.Email, error.Description);
+                }
             }
             return View(model);
         }
@@ -229,12 +253,15 @@ namespace Inventory_Managment_System.Controllers
         [HttpGet]
         public IActionResult ResetPasswordConfirmation()
         {
+            _logger.LogInformation("Accessing Reset Password Confirmation view");
             return View();
         }
 
         [HttpGet]
         public IActionResult ForgotPasswordConfirmation()
         {
+            _logger.LogInformation("Accessing Forgot Password Confirmation view");
+            // This view is no longer needed for the new flow but kept for fallback
             return View();
         }
 

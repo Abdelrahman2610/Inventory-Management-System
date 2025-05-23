@@ -1,11 +1,11 @@
-﻿@model Inventory_Managment_System.DTOs.ForgotPasswordModel
+﻿@model Inventory_Managment_System.DTOs.SecurityQuestionModel
 
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h4>Forgot Password</h4>
+                    <h4>Security Question</h4>
                 </div>
                 <div class="card-body">
                     @if (!ViewData.ModelState.IsValid)
@@ -17,11 +17,12 @@
                             }
                         </div>
                     }
-                    <form asp-action="ForgotPassword" method="post">
+                    <form asp-action="SecurityQuestion" method="post">
+                        <input type="hidden" asp-for="Email" value="@ViewBag.Email" />
                         <div class="mb-3">
-                            <label asp-for="Email" class="form-label"></label>
-                            <input asp-for="Email" class="form-control" placeholder="Enter your email" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
+                            <label class="form-label">@ViewBag.SecurityQuestion</label>
+                            <input asp-for="Answer" class="form-control" placeholder="Enter your answer" />
+                            <span asp-validation-for="Answer" class="text-danger"></span>
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
