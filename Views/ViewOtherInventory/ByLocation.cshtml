@@ -1,0 +1,88 @@
+﻿@model IEnumerable<DEPI_GraduationProject.Models.Inventory>
+
+@{
+    ViewData["Title"] = "Other Branch Inventory";
+    var location = ViewBag.Location as DEPI_GraduationProject.Models.Location;
+}
+
+<h2 class="mb-4">Inventory at @location?.Name (@location?.Type)</h2>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.4.1/css/rowGroup.dataTables.min.css" />
+
+<table id="otherInventoryTable" class="display nowrap" style="width:100%">
+    <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Code</th>
+            <th>Color</th>
+            <th>Type</th>
+            <th>Quantity</th>
+            <th>Shelf</th>
+        </tr>
+        <tr>
+            <th><select><option value="">All</option></select></th>
+            <th><select><option value="">All</option></select></th>
+            <th><select><option value="">All</option></select></th>
+            <th><select><option value="">All</option></select></th>
+            <th><select><option value="">All</option></select></th>
+            <th><select><option value="">All</option></select></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Product?.name</td>
+                <td>@item.Product?.Code</td>
+                <td>@item.Product?.color</td>
+                <td>@item.Product?.type</td>
+                <td>@item.Quantity</td>
+                <td>@item.Shelf</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/rowgroup/1.4.1/js/dataTables.rowGroup.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var table = $('#otherInventoryTable').DataTable({
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                order: [[0, 'asc']],
+                initComplete: function () {
+                    this.api().columns([0, 1, 2, 3, 4, 5]).every(function () {
+                        var column = this;
+                        var select = $('<select><option value="">All</option></select>')
+                            .appendTo($(column.header()).empty())
+                            .on('change', function () {
+                                var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                                column.search(val ? '^' + val + '$' : '', true, false).draw();
+                            });
+
+                        column.data().unique().sort().each(function (d, j) {
+                            if (d) {
+                                select.append('<option value="' + d + '">' + d + '</option>');
+                            }
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+}
