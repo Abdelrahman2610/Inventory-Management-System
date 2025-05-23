@@ -1,8 +1,8 @@
-﻿@model IEnumerable<DEPI_GraduationProject.Models.Inventory>
+﻿@model IEnumerable<Inventory_Managment_System.Models.Inventory>
 
 @{
     ViewData["Title"] = "Other Branch Inventory";
-    var location = ViewBag.Location as DEPI_GraduationProject.Models.Location;
+    var location = ViewBag.Location as Inventory_Managment_System.Models.Location;
 }
 
 <h2 class="mb-4">Inventory at @location?.Name (@location?.Type)</h2>

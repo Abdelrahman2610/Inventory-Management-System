@@ -100,14 +100,16 @@ namespace Inventory_Managment_System.Controllers
             {
                 try
                 {
-                    // 1. Create the main Sale record
+                    // Create the main Sale record
                     var sale = new Sales // Use 'Sales' model name
                     {
                         location_id = locationId,
                         client_id = clientId,
                         sale_date = DateTime.UtcNow,
+                        Clients = client, // Set the required 'Clients' property
+                        Location = await _context.Locations.FirstOrDefaultAsync(l => l.Id == locationId)
+                                   ?? throw new Exception("Location not found."), // Set the required 'Location' property
                         SaleDetails = new List<SaleDetails>(), // Initialize collections
-
                     };
                     _context.Sales.Add(sale);
                     // Save now to get sale.Id
