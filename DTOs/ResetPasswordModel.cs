@@ -18,7 +18,5 @@ namespace Inventory_Managment_System.DTOs
         [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
-        // Remove Token since we're not using email links
-        // public string Token { get; set; }
     }
 }
