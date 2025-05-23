@@ -1,4 +1,4 @@
-﻿namespace DEPI_GraduationProject.DTOs
+﻿namespace Inventory_Managment_System.DTOs
 {
     public class LoginWith2faModel
     {

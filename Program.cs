@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Inventory_Managment_System.Data; // Namespace where AppDbContext is defined
-using Inventory_Managment_System.Models;
 using Inventory_Managment_System.Services;
+using Inventory_Managment_System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

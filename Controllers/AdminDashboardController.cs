@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-public class AdminDashboardController : Controller
+namespace Inventory_Managment_System.Controllers
 {
-    public IActionResult Index()
+    [Authorize(Roles = "Admin")]
+    public class AdminDashboardController : Controller
     {
-        ViewBag.Role = TempData["UserRole"] ?? "Unknown";
-        return View();
+        public IActionResult Index()
+        {
+            return View();
+        }
     }
 }

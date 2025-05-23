@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using System;
 
 public class ProductsController : Controller
 {
@@ -155,4 +154,3 @@ public class ProductsController : Controller
         return RedirectToAction("Index");
     }
 }
-

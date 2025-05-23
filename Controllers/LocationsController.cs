@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Inventory_Managment_System.Models;
-using System;
 
 namespace Inventory_Managment_System.Controllers
 {
