@@ -1,51 +1,58 @@
 # Inventory Management System (IMS)
 
-## Overview
+With flexible configuration options, the IMS supports customized inventory policies and reporting needs, enabling **data-driven decision-making** and **supply chain optimization**.
 
-The **Inventory Management System (IMS)** is a web-based application built with ASP.NET Core MVC and Entity Framework, designed to facilitate efficient inventory tracking, sales recording, and stock movement across multiple business locations—particularly in the **automotive repair industry**.
+## Project Scope
+
+The **Inventory Management System (IMS)** is a robust web-based application tailored for businesses, particularly in the **automotive repair industry**, to manage their inventory operations across multiple branches. Its core functionality includes monitoring stock levels, managing product data, recording sales, and generating reports.
+
+The IMS addresses the common challenges faced by inventory managers and administrators by leveraging a relational database and an intuitive web interface. It streamlines inventory-related workflows, reduces manual effort, and enhances operational efficiency.
 
 IMS ensures streamlined inventory operations with features such as:
 
-* Real-time inventory tracking across branches
-* Role-based access control
-* Sales logging and inter-location order management
-* Client and employee data management
-* Identity integration via ASP.NET Core Identity
+* Real-time inventory tracking across multiple branches for accurate and reliable stock records
+* Role-based access control to ensure secure and appropriate system access
+* Sales logging and inter-location order management to streamline transactions and stock movement
+* Client and employee data management for centralized and organized information
+* Identity integration via ASP.NET Core Identity for secure authentication and authorization
+* Real-time stock visibility across all locations to enhance decision-making
+* Automated alerts to prevent overstocking and understocking issues
+* Enhanced customer service through optimized stock levels and faster response times
 
 ---
 
 ## Architecture
 
-### Application Layers
+### Application Layers – 3-Tier Architecture
 
-The solution follows a **3-tier architecture**:
+1. **Presentation Layer (Frontend)**  
+   * Built with **ASP.NET Core MVC** (Views and Controllers).  
+   * Uses **HTML** for structured content, **CSS** for styling, and **Bootstrap** for responsive, mobile-first design.  
+   * Implements a clear separation of concerns following the MVC pattern for a maintainable UI.
 
-1. **Presentation Layer (Frontend)**
+2. **Business Logic Layer**  
+   * Developed using **C#** within the .NET ecosystem.  
+   * Handles all core logic, such as inventory checks, sales operations, and role-based access control.  
+   * Ensures scalability and clean application behavior through service classes and controller logic.
 
-   * ASP.NET Core MVC (Views and Controllers)
-   * Bootstrap + HTML/CSS for responsive UI
+3. **Data Access Layer**  
+   * Utilizes **Entity Framework Core** as the ORM.  
+   * Connects to a **SQL Server** database for efficient, type-safe data operations.  
+   * Supports complex transactions and queries for reliable inventory and user data management.
 
-2. **Business Logic Layer**
+---
 
-   * C# service classes and controller logic
-   * Enforces domain rules (e.g., inventory checks)
+## 🔧 Core Technologies
 
-3. **Data Access Layer**
-
-   * Entity Framework Core ORM
-   * DBMS relational database
-
-### Core Technologies
-
-| Component      | Technology            |
-| -------------- | --------------------- |
-| Language       | C#                    |
-| Framework      | ASP.NET Core MVC      |
-| ORM            | Entity Framework Core |
-| Database       | DBMS            |
-| Authentication | ASP.NET Core Identity |
-| UI Framework   | Bootstrap + HTML/CSS  |
-| Web Server     | IIS                   |
+| Component         | Technology / Description                                                                 |
+| ----------------- | ----------------------------------------------------------------------------------------- |
+| **Language**       | C# – Type-safe and robust, ideal for scalable application logic                          |
+| **Framework**      | .NET / ASP.NET Core MVC – High-performance, cross-platform web framework                 |
+| **ORM**            | Entity Framework Core – Simplifies database interaction and supports LINQ queries        |
+| **Database**       | SQL Server – Secure and efficient relational database system                             |
+| **Authentication** | ASP.NET Core Identity – Role-based access control and user authentication                |
+| **UI Framework**   | Bootstrap + HTML/CSS – Responsive design and consistent, modern UI                       |
+| **Web Server**     | IIS (Internet Information Services) – Reliable hosting for .NET Core applications        |
 
 ---
 
@@ -56,8 +63,8 @@ Follow these steps to configure and run the IMS locally:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Abdelrahman2610/inventory-management-system.git
-cd inventory-management-system
+git clone https://github.com/Abdelrahman2610/Inventory-Management-System.git
+cd Inventory-Management-System
 ```
 
 ### 2. Configure the Database
