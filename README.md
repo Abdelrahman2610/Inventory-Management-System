@@ -1,116 +1,283 @@
 # Inventory Management System (IMS)
 
-## Project Scope
+## Overview
 
-The **Inventory Management System (IMS)** is a robust web-based application tailored for businesses particularly in the **automotive repair industry** to manage their inventory operations across multiple branches. Its core functionality includes monitoring stock levels, managing product data, recording sales, and generating reports.
+The **Inventory Management System (IMS)** is a web-based application built with ASP.NET Core MVC and Entity Framework, designed to facilitate efficient inventory tracking, sales recording, and stock movement across multiple business locations—particularly in the **automotive repair industry**.
 
-The IMS addresses the common challenges faced by inventory managers and administrators by leveraging a relational database and an intuitive web interface. It streamlines inventory-related workflows, reduces manual effort, and enhances operational efficiency.
+IMS ensures streamlined inventory operations with features such as:
 
-Key benefits include:
-- Improved accuracy and reliability of inventory records
-- Real-time stock tracking across multiple locations
-- Automated alerts to prevent overstocking and understocking
-- Enhanced customer service through optimized stock levels
+* Real-time inventory tracking across branches
+* Role-based access control
+* Sales logging and inter-location order management
+* Client and employee data management
+* Identity integration via ASP.NET Core Identity
 
-With flexible configuration options, the IMS supports customized inventory policies and reporting needs, enabling **data-driven decision-making** and **supply chain optimization**.
+---
 
+## Architecture
 
-## Planned Tools
+### Application Layers
 
-- **Programming Language**: C# within the .NET ecosystem, providing a robust and type-safe environment for building scalable and maintainable application logic.
-- **Framework**: .NET enabling high performance, cross-platform compatibility, and support for modern web applications.
-- **Database**: SQL Server, used for efficient data storage, retrieval, and management, ensuring reliable and secure handling of inventory data with support for complex queries and transactions.
-- **ORM (Optional)**: Entity Framework Core, integrated with .NET C# to simplify database interactions, improve development speed, and ensure type-safe data operations.
-- **Frontend Web Framework**: ASP.NET Core MVC, used for the frontend to implement a Model-View-Controller architecture, enabling the development of dynamic, scalable, and maintainable web interfaces with clear separation of concerns.
-- **Frontend Markup and Styling**:
-  - **HTML**: Utilized as the standard markup language for structuring the frontend web interfaces, ensuring semantic and accessible content delivery within ASP.NET Core MVC views.
-  - **CSS**: Employed for custom styling and layout adjustments, complementing Bootstrap to fine-tune the visual design and ensure a cohesive user experience.
-  - **Bootstrap**: Used as the primary frontend CSS framework to provide responsive, mobile-first styling, ensuring user-friendly, visually consistent, and cross-device-compatible web interfaces with minimal custom CSS.
-- **Web Server**: Microsoft Internet Information Services (IIS), selected to host the ASP.NET Core MVC application, offering robust performance, security features, and seamless integration with the .NET ecosystem for reliable deployment.
-- **Authentication/Authorization**: ASP.NET Core Identity, paired with SQL Server, to implement secure user management and role-based access control.
+The solution follows a **3-tier architecture**:
+
+1. **Presentation Layer (Frontend)**
+
+   * ASP.NET Core MVC (Views and Controllers)
+   * Bootstrap + HTML/CSS for responsive UI
+
+2. **Business Logic Layer**
+
+   * C# service classes and controller logic
+   * Enforces domain rules (e.g., inventory checks)
+
+3. **Data Access Layer**
+
+   * Entity Framework Core ORM
+   * DBMS relational database
+
+### Core Technologies
+
+| Component      | Technology            |
+| -------------- | --------------------- |
+| Language       | C#                    |
+| Framework      | ASP.NET Core MVC      |
+| ORM            | Entity Framework Core |
+| Database       | DBMS            |
+| Authentication | ASP.NET Core Identity |
+| UI Framework   | Bootstrap + HTML/CSS  |
+| Web Server     | IIS                   |
+
+---
+
+## Setup Instructions
+
+Follow these steps to configure and run the IMS locally:
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Abdelrahman2610/inventory-management-system.git
+cd inventory-management-system
+```
+
+### 2. Configure the Database
+
+Update `appsettings.json` with your SQL Server connection string:
+
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=YOUR_SERVER;Database=IMS_DB;Trusted_Connection=True;MultipleActiveResultSets=true"
+}
+```
+
+### 3. Apply Migrations and Seed Data
+
+Use the CLI to apply migrations and seed initial data:
+
+```bash
+dotnet ef database update
+```
+
+(Optional) You can include a data seeding class in `Startup.cs` or `Program.cs`.
+
+### 4. Run the Application
+
+```bash
+dotnet run
+```
+
+Visit `https://localhost:5001` in your browser to access the application.
+
+---
 
 ## Database Design
 
-**Decision**: Use SQL Server with a normalized schema comprising the following tables:
+### Core Business Tables
 
-### Products Table
-Stores product details:
-- `ProductID` [PK]
-- `Name`
-- `Type`
-- `Color`
+#### Products
 
-### Inventory Table
-Tracks stock levels:
-- `InventoryID` [PK]
-- `ProductID` [FK]
-- `LocationID` [FK]
-- `Quantity`
+Stores product details.
 
-### Locations Table
-Manages warehouse/store locations:
-- `LocationID` [PK]
-- `LocationName`
-- `Address`
+| Column    | Type   | Description               |
+| --------- | ------ | ------------------------- |
+| ProductID | PK     | Unique product identifier |
+| Name      | string | Product name              |
+| Type      | string | Product type              |
+| Color     | string | Product color             |
 
-### Orders Table
-Records inter-location transfers:
-- `OrderID` [PK]
-- `SourceLocationID` [FK]
-- `DestinationLocationID` [FK]
-- `OrderDate`
-- `Status`
+#### Inventory
 
-### OrderDetails Table
-Details products in orders:
-- `OrderDetailID` [PK]
-- `OrderID` [FK]
-- `ProductID` [FK]
-- `Quantity`
+Tracks product stock per location.
 
-### Sales Table
-Logs sales transactions:
-- `SaleID` [PK]
-- `EmployeeID` [FK]
-- `ClientID` [FK]
-- `SaleDate`
-- `WindshieldCode` [nullable]
-- `AdhesiveAmount` [nullable]
+| Column      | Type | Description                |
+| ----------- | ---- | -------------------------- |
+| InventoryID | PK   | Unique inventory record ID |
+| ProductID   | FK   | Links to `Products`        |
+| LocationID  | FK   | Links to `Locations`       |
+| Quantity    | int  | Current stock level        |
 
-### SaleDetails Table
-Specifies products sold:
-- `SaleDetailID` [PK]
-- `SaleID` [FK]
-- `ProductID` [FK]
-- `Quantity`
-- `Price`
+#### Locations
 
-### Clients Table
-Stores client information:
-- `ClientID` [PK]
-- `FullName`
-- `ContactNumber`
-- `Email`
-- `Address`
+Manages warehouse or branch data.
 
-### Employees Table
-Manages employee data:
-- `EmployeeID` [PK]
-- `FullName`
-- `Username`
-- `PasswordHash`
-- `Role`
-- `AssignedLocationID` [FK]
+| Column       | Type   | Description          |
+| ------------ | ------ | -------------------- |
+| LocationID   | PK     | Unique location ID   |
+| LocationName | string | Name of the location |
+| Address      | string | Physical address     |
 
-## Table Structure
+#### Orders
 
-- **Products**: Includes `Type` and `Color` to support diverse inventory categorization, enabling flexible filtering and reporting.
-- **Inventory**: Links `ProductID` and `LocationID` to track stock per product and location, supporting multi-warehouse management.
-- **Locations**: Stores `LocationName` and `Address` for clear identification of stock locations, critical for order fulfillment.
-- **Orders and OrderDetails**: Separates order metadata (Orders) from product specifics (OrderDetails) to handle multiple products per order efficiently, supporting stock transfers between locations.
-- **Sales and SaleDetails**: Similar to Orders, separates sale metadata (including niche fields like `WindshieldCode` and `AdhesiveAmount` for specific industries) from product details, enabling detailed sales tracking and reporting.
-- **Clients**: Centralizes client data for sales and customer relationship management, with fields like `Email` and `ContactNumber` for communication.
-- **Employees**: Includes `Role` and `AssignedLocationID` to support role-based access control and location-specific responsibilities, with `PasswordHash` for secure authentication.
+Logs inter-location transfers.
 
-- **Foreign Keys**: Enforce relationships (e.g., `ProductID` in `OrderDetails` and `SaleDetails`) to maintain consistency and support cascading updates/deletes where applicable.
-- **Nullable Fields**: Fields like `WindshieldCode` and `AdhesiveAmount` in `Sales` are nullable to accommodate industry-specific data without enforcing unnecessary constraints.
+| Column                | Type   | Description                    |
+| --------------------- | ------ | ------------------------------ |
+| OrderID               | PK     | Unique order ID                |
+| SourceLocationID      | FK     | Sending location               |
+| DestinationLocationID | FK     | Receiving location             |
+| OrderDate             | date   | Date of transfer initiation    |
+| Status                | string | Transfer status (Pending/Done) |
+
+#### OrderDetails
+
+Line items for each order.
+
+| Column        | Type | Description      |
+| ------------- | ---- | ---------------- |
+| OrderDetailID | PK   | Unique ID        |
+| OrderID       | FK   | Parent order     |
+| ProductID     | FK   | Product included |
+| Quantity      | int  | Number of units  |
+
+#### Sales
+
+Logs customer sales transactions.
+
+| Column         | Type    | Description                    |
+| -------------- | ------- | ------------------------------ |
+| SaleID         | PK      | Unique sale ID                 |
+| EmployeeID     | FK      | Associated employee            |
+| ClientID       | FK      | Associated client              |
+| SaleDate       | date    | Date of sale                   |
+| WindshieldCode | string  | Optional, specific to industry |
+| AdhesiveAmount | decimal | Optional, specific measurement |
+
+#### SaleDetails
+
+Individual products in a sale.
+
+| Column       | Type    | Description         |
+| ------------ | ------- | ------------------- |
+| SaleDetailID | PK      | Unique ID           |
+| SaleID       | FK      | Linked sale         |
+| ProductID    | FK      | Product sold        |
+| Quantity     | int     | Quantity sold       |
+| Price        | decimal | Sale price per unit |
+
+#### Clients
+
+Stores client data.
+
+| Column        | Type   | Description      |
+| ------------- | ------ | ---------------- |
+| ClientID      | PK     | Unique client ID |
+| FullName      | string | Client name      |
+| ContactNumber | string | Phone number     |
+| Email         | string | Email address    |
+| Address       | string | Mailing address  |
+
+#### Employees
+
+Staff details and access role.
+
+| Column             | Type   | Description       |
+| ------------------ | ------ | ----------------- |
+| EmployeeID         | PK     | Unique ID         |
+| FullName           | string | Employee name     |
+| Username           | string | Login name        |
+| PasswordHash       | string | Hashed password   |
+| Role               | string | System role       |
+| AssignedLocationID | FK     | Associated branch |
+
+---
+
+### ASP.NET Identity Tables
+
+#### AspNetUsers
+
+Manages authentication and user profile data.
+
+| Column                 | Description             |
+| ---------------------- | ----------------------- |
+| Id (PK)                | Unique user ID          |
+| UserName               | User's login name       |
+| Email                  | User's email address    |
+| PasswordHash           | Hashed user password    |
+| EmailConfirmed         | Email confirmation flag |
+| LockoutEnabled         | Enables account lockout |
+| AccessFailedCount      | Failed login attempts   |
+| PhoneNumber, 2FA, etc. | Security-related fields |
+
+#### AspNetRoles
+
+Defines available roles (Admin, Manager, etc.).
+
+| Column         | Description                |
+| -------------- | -------------------------- |
+| Id (PK)        | Unique role ID             |
+| Name           | Role name                  |
+| NormalizedName | Searchable version of name |
+
+#### AspNetUserRoles
+
+Links users to roles.
+
+| Column | Description       |
+| ------ | ----------------- |
+| UserId | FK to AspNetUsers |
+| RoleId | FK to AspNetRoles |
+
+#### AspNetUserClaims
+
+Stores user-specific claims.
+
+| Column     | Description       |
+| ---------- | ----------------- |
+| Id (PK)    | Claim record ID   |
+| UserId     | FK to AspNetUsers |
+| ClaimType  | Type of the claim |
+| ClaimValue | Value assigned    |
+
+#### AspNetRoleClaims
+
+Claims assigned to a role instead of individual users.
+
+| Column     | Description       |
+| ---------- | ----------------- |
+| Id (PK)    | Claim record ID   |
+| RoleId     | FK to AspNetRoles |
+| ClaimType  | Type of the claim |
+| ClaimValue | Value assigned    |
+
+#### AspNetUserLogins
+
+Supports third-party login providers.
+
+| Column             | Description                  |
+| ------------------ | ---------------------------- |
+| LoginProvider (PK) | Provider name (e.g., Google) |
+| ProviderKey (PK)   | Unique key from the provider |
+| UserId             | FK to AspNetUsers            |
+
+#### AspNetUserTokens
+
+Used for storing tokens (e.g., reset password, 2FA).
+
+| Column        | Description         |
+| ------------- | ------------------- |
+| UserId        | FK to AspNetUsers   |
+| LoginProvider | Token provider name |
+| Name          | Token name          |
+| Value         | Token value         |
+
+
